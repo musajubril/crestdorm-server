@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 var router = express_1.default.Router();
 const cors_1 = __importDefault(require("cors"));
-const StudentController_1 = __importDefault(require("controller/StudentController"));
+const StudentController_1 = __importDefault(require("../controller/StudentController"));
 router.use((0, cors_1.default)());
 router.get("/", (req, res) => StudentController_1.default.GetStudents(req, res));
 router.get("/rooms", (req, res) => StudentController_1.default.GetAllRooms(req, res));

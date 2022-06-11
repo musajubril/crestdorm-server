@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 var router = express_1.default.Router();
 const cors_1 = __importDefault(require("cors"));
-const BursarController_1 = __importDefault(require("controller/BursarController"));
+const BursarController_1 = __importDefault(require("../controller/BursarController"));
 router.use((0, cors_1.default)());
 router.post("/login", (req, res) => BursarController_1.default.Login(req, res));
 router.post("/not_verified", (req, res) => BursarController_1.default.SetNotVerified(req, res));
