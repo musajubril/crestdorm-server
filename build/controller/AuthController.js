@@ -78,7 +78,8 @@ class AuthController {
                             const payload = {
                                 userId: user._id,
                                 email: user.email,
-                                phone_number: user.email
+                                phone_number: user.email,
+                                account_type: user.account_type
                             };
                             let token = jsonwebtoken_1.default.sign(payload, key);
                             res.json(token);
@@ -123,6 +124,32 @@ class AuthController {
                             });
                         }));
                     }
+                })
+                    .catch((err) => {
+                    res.send("error" + err);
+                });
+            });
+        });
+    }
+    static CreateAdmin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { password, email, phone_number } = req.body;
+            const NewUser = {
+                password, email, phone_number, account_type: "Admin"
+            };
+            bcryptjs_1.default.hash(password, 10, (err, hash) => {
+                User_1.default.findOne({ email, phone_number, account_type: "Admin" }).then((user) => {
+                    if (user) {
+                        console.log(user);
+                        (0, HandleResponse_1.HandleResponse)(res, 500, `An account with the email: ${email} exists already`, user);
+                    }
+                    if (!user) {
+                        NewUser.password = hash;
+                        User_1.default.create(NewUser).then(() => {
+                            (0, HandleResponse_1.HandleResponse)(res, 200, `${email} registration successful`, email);
+                        });
+                    }
+                    ;
                 })
                     .catch((err) => {
                     res.send("error" + err);

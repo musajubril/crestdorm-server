@@ -63,7 +63,8 @@ class AuthController {
             const payload = {
               userId: user._id,
               email: user.email,
-              phone_number: user.email
+              phone_number: user.email,
+              account_type: user.account_type
             };
             let token = jwt.sign(payload, key);
             res.json(token);
@@ -107,6 +108,29 @@ class AuthController {
             })
           });
         }
+      })
+        .catch((err) => {
+          res.send("error" + err);
+        })
+    })
+  }
+  static async CreateAdmin(req, res) {
+    const { password, email, phone_number } = req.body
+    const NewUser = {
+      password, email, phone_number, account_type: "Admin"
+    }
+    bcrypt.hash(password, 10, (err, hash) => {
+      User.findOne({ email, phone_number, account_type: "Admin" }).then((user) => {
+        if (user) {
+          console.log(user);
+          HandleResponse(res, 500, `An account with the email: ${email} exists already`, user)
+        }
+        if (!user) {
+          NewUser.password = hash          
+          User.create(NewUser).then(() => {
+                HandleResponse(res, 200, `${email} registration successful`, email)
+            })
+          };
       })
         .catch((err) => {
           res.send("error" + err);
