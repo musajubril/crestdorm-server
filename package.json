@@ -13,7 +13,8 @@
     "nodemon": "^2.0.16"
   },
   "scripts": {
-    "start": "nodemon server.ts"
+    "start": "nodemon server.ts",
+    "prod:start": "nodemon build/server.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
