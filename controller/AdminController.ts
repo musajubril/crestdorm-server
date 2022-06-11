@@ -1,8 +1,7 @@
-import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Users from "models/Student";
-import { HandleResponse } from "HandleResponse";
+import Users from "../models/Student";
+import { HandleResponse } from "../HandleResponse";
 import Room from './../models/Room';
 import Bursar from './../models/Bursar';
 import Booking from './../models/Booking';

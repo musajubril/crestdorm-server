@@ -1,8 +1,7 @@
-import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Users from "models/Student";
-import { HandleResponse } from "HandleResponse";
+import Users from "../models/Student";
+import { HandleResponse } from "../HandleResponse";
 import Booking from './../models/Booking';
 const key = process.env.SECRET_KEY || "secret";
 class BursarController {

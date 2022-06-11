@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const Student_1 = __importDefault(require("models/Student"));
-const HandleResponse_1 = require("HandleResponse");
+const Student_1 = __importDefault(require("../models/Student"));
+const HandleResponse_1 = require("../HandleResponse");
 const Booking_1 = __importDefault(require("./../models/Booking"));
 const key = process.env.SECRET_KEY || "secret";
 class BursarController {
