@@ -1,7 +1,7 @@
 import express from "express"
 var router = express.Router()
 import cors from "cors"
-import BursarController from 'controller/BursarController';
+import BursarController from '../controller/BursarController';
 router.use(cors())
 
 router.post("/login", (req, res)=> BursarController.Login(req, res))

@@ -1,7 +1,7 @@
 import express from "express"
 var router = express.Router()
 import cors from "cors"
-import StudentController from 'controller/StudentController';
+import StudentController from '../controller/StudentController';
 router.use(cors())
 
 router.get("/", (req, res)=> StudentController.GetStudents(req, res))

@@ -1,7 +1,7 @@
 import express from "express"
 var router = express.Router()
 import cors from "cors"
-import AdminController from 'controller/AdminController';
+import AdminController from '../controller/AdminController';
 router.use(cors())
 
 router.post("/bursar/:booking_id", (req, res)=> AdminController.SendDataToBursar(req, res))
