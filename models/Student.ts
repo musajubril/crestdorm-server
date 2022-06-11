@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
-const UsersSchema = new mongoose.Schema({
+const StudentSchema = new mongoose.Schema({
     email: String,
-    password: String,
+    student_id: String,
+    admin_id: String,
     phone_number: String,
     full_name: String,
     matric_number: String,
@@ -17,5 +18,5 @@ const UsersSchema = new mongoose.Schema({
         default: Date.now
     }
 })
-const Users = mongoose.model('Users', UsersSchema);
-export default Users;
+const Student = mongoose.model('Student', StudentSchema);
+export default Student;

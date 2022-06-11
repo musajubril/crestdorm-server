@@ -1,16 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require('mongoose');
-const BursarSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     email: String,
-    full_name: String,
-    user_id: String,
-    admin_id: String,
     password: String,
-    verified: {
-        type: Boolean,
-        default: false
-    },
+    account_type: String,
     phone_number: String,
     modified: {
         type: Date,
@@ -21,5 +15,5 @@ const BursarSchema = new mongoose.Schema({
         default: Date.now
     }
 });
-const Bursar = mongoose.model('Bursar', BursarSchema);
-exports.default = Bursar;
+const User = mongoose.model('User', UserSchema);
+exports.default = User;

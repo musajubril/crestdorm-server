@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const BursarSchema = new mongoose.Schema({
     email: String,
     full_name: String,
+    user_id: String,
     admin_id: String,
     password: String,
     verified: {
