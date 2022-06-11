@@ -6,5 +6,6 @@ router.use(cors())
 
 router.post("/login", (req, res)=> AuthController.Login(req, res))
 router.post("/admin-register", (req, res)=> AuthController.CreateAdmin(req, res))
+router.post("/student-register", (req, res)=> AuthController.CreateStudent(req, res))
 
 module.exports = router

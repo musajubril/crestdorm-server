@@ -10,4 +10,5 @@ const AuthController_1 = __importDefault(require("../controller/AuthController")
 router.use((0, cors_1.default)());
 router.post("/login", (req, res) => AuthController_1.default.Login(req, res));
 router.post("/admin-register", (req, res) => AuthController_1.default.CreateAdmin(req, res));
+router.post("/student-register", (req, res) => AuthController_1.default.CreateStudent(req, res));
 module.exports = router;
