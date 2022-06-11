@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const mongoose_1 = __importDefault(require("mongoose"));
+require('dotenv').config();
 const app = (0, express_1.default)();
 var StudentRouter = require('./routes/student');
 var AdminRouter = require('./routes/admin');

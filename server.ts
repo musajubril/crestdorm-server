@@ -2,6 +2,7 @@ import express from "express"
 import path from "path"
 import cors from "cors"
 import mongoose from "mongoose"
+require('dotenv').config()
 const app = express();
 var StudentRouter = require('./routes/student')
 var AdminRouter = require('./routes/admin')
