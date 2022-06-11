@@ -61,7 +61,7 @@ class AuthController {
           console.log("Admin")
           if (bcrypt.compareSync(password, user.password)) {
             const payload = {
-              userId: user._id,
+              admin_id: user._id,
               email: user.email,
               phone_number: user.email,
               account_type: user.account_type

@@ -64,20 +64,35 @@ class AdminController {
   static async CreateBursarAccount(req, res) {
     // TODO: send email or message once Bursar account creates successfully
     var decode = jwt.verify(req.headers['authorization'],key)
-    const { email, phone_number, full_name} = req.body
+    const { email, phone_number, full_name, admin_id} = req.body
     const NewBursar = {
       email,
       full_name,
-      phone_number
+      phone_number,
+      admin_id
     }
-    await Bursar.findOne({admin_id: decode._id})
-    .then(bursar=>{
+    await Bursar.findOne({admin_id: decode.admin_id})
+    .then(async bursar=>{
       if(!bursar) {
         Bursar.create(NewBursar)
         .then(()=>HandleResponse(res, 200, `${full_name}'s account created successfully`, NewBursar))
       }
       else {
-        HandleResponse(res, 200, `${full_name}'s account creation failed, you can't have more than one Bursar`, bursar)
+        await Bursar.findOneAndUpdate({admin_id: decode.admin_id}, {
+          $set: {email,
+            full_name,
+            phone_number,
+            admin_id}
+      }, {
+          new: true,
+          runValidators: true,
+          upsert: true,
+          returnOriginal: false,
+          returnNewDocument: true
+      }).exec()
+      .then(()=>{
+        HandleResponse(res, 200, `${full_name}'s account updated successfully`, bursar)
+      })
       }
     })
   }
@@ -105,6 +120,17 @@ class AdminController {
       HandleResponse(res, 200, `All Bookings found successfully`, bookings)
     })
   })
+  }
+  static async GetAllRooms(req, res) {
+    var decode = jwt.verify(req.headers['authorization'],key)
+    await Room.find({admin_id: decode.admin_id})
+    .sort({created: -1})
+    .then(rooms=> HandleResponse(res, 200, `All rooms retrieved successfully`, rooms))
+  }
+  static async GetBursar(req, res) {
+    var decode = jwt.verify(req.headers['authorization'],key)
+    await Bursar.findOne({admin_id: decode.admin_id})
+    .then(bursar=> HandleResponse(res, 200, `Bursar info retrieval was a success`, bursar))
   }
 }
 export default AdminController;

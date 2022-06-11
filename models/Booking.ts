@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const BookingSchema = new mongoose.Schema({
     type: String,
+    admin_id: String,
     send_to_bursar: {
         type: Boolean,
         default: false

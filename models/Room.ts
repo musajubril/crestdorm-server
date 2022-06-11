@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const RoomSchema = new mongoose.Schema({
     type: String,
     image: String,
+    admin_id: String,
     video: String,
     availability: {
         type: Boolean,
