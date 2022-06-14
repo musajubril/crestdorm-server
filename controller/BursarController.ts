@@ -12,7 +12,7 @@ class BursarController {
         if (bcrypt.compareSync(password, user.password)) {
           const payload = {
             userId: user._id,
-            email: user.email,
+            email: user.email.toLowerCase(),
             phone_number: user.email
           };
           let token = jwt.sign(payload, key);

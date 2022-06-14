@@ -12,7 +12,10 @@ const RoomSchema = new mongoose.Schema({
     room_number: String,
     number_of_bookings: String,
     number_acceptable: String,
-    number_in_room: String,
+    number_in_room: {
+        default: 0,
+        type: Number
+    },
     hostel_name: String,
     gender: String,
     price: String,

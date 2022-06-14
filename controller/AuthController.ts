@@ -6,10 +6,54 @@ import User from "../models/User";
 import { HandleResponse } from "../HandleResponse";
 const key = process.env.SECRET_KEY || "secret";
 class AuthController {
+  static async VerifyBursar(req, res) {
+    const {email, password} = req.body
+    const NewUser = {
+      email:email.toLowerCase(), password, phone_number: null, account_type: "Bursar"
+    }
+    await Bursar.findOne({email: email.toLowerCase()})
+    .then(async bursar=> {
+      if(bursar) {
+        await Bursar.findOneAndUpdate({email: email.toLowerCase()}, {
+          $set: {verified: true}
+      }, {
+          new: true,
+          runValidators: true,
+          upsert: true,
+          returnOriginal: false,
+          returnNewDocument: true
+      }).exec()
+      .then( ()=>{
+        bcrypt.hash(password, 10, async(err, hash) => {
+          NewUser.password = hash
+          NewUser.phone_number = bursar.phone_number         
+          await User.create(NewUser).then(async (user) => {
+            await Bursar.findOneAndUpdate({email: email.toLowerCase()}, {
+              $set: {user_id: user._id}
+          }, {
+              new: true,
+              runValidators: true,
+              upsert: true,
+              returnOriginal: false,
+              returnNewDocument: true
+          }).exec()
+          .then(()=>{
+            HandleResponse(res, 200, `${bursar.full_name} account verification successful`, bursar)
+
+          })
+              })
+            })
+          })
+        }
+        else {
+        HandleResponse(res, 500, `${email} account verification failed`, email)
+      }
+    })
+  }
   static async Login(req, res) {
     const { email, password } = req.body;
     console.log(email, password)
-    await User.findOne({ email }).then((user) => {
+    await User.findOne({ email: email.toLowerCase() }).then((user) => {
       if (user) {
         if(user.account_type==="Student") {
           console.log("Student")
@@ -88,7 +132,7 @@ class AuthController {
       password, email, phone_number, account_type: "Student"
     }
     bcrypt.hash(password, 10, (err, hash) => {
-      User.findOne({ email, phone_number }).then((user) => {
+      User.findOne({ email: email.toLowerCase(), phone_number }).then((user) => {
         if (user) {
           console.log(user);
           HandleResponse(res, 500, `An account with the email: ${full_name} exists already`, user)
@@ -96,7 +140,7 @@ class AuthController {
         if (!user) {
           NewUser.password = hash          
           User.create(NewUser).then(async() => {
-            await User.findOne({email, phone_number, account_type: "Student"})
+            await User.findOne({email: email.toLowerCase(), phone_number, account_type: "Student"})
             .then(verifiedUser=>{
               NewStudent.student_id = verifiedUser._id
               Student.create(NewStudent).then(()=>{
@@ -120,7 +164,7 @@ class AuthController {
       password, email, phone_number, account_type: "Admin"
     }
     bcrypt.hash(password, 10, (err, hash) => {
-      User.findOne({ email, phone_number, account_type: "Admin" }).then((user) => {
+      User.findOne({ email: email.toLowerCase(), phone_number, account_type: "Admin" }).then((user) => {
         if (user) {
           console.log(user);
           HandleResponse(res, 500, `An account with the email: ${email} exists already`, user)

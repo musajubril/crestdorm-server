@@ -40,6 +40,7 @@ class AdminController {
       gender,
       price
     } = req.body
+    var decode = jwt.verify(req.headers['authorization'],key)
     const NewRoom = {
       type,
       image,
@@ -48,7 +49,8 @@ class AdminController {
       number_acceptable,
       hostel_name,
       gender,
-      price
+      price,
+      admin_id: decode.admin_id
     }
     Room.findOne({room_number, hostel_name, gender})
     .then(room=>{
@@ -66,7 +68,7 @@ class AdminController {
     var decode = jwt.verify(req.headers['authorization'],key)
     const { email, phone_number, full_name, admin_id} = req.body
     const NewBursar = {
-      email,
+      email: email.toLowerCase(),
       full_name,
       phone_number,
       admin_id
@@ -79,7 +81,7 @@ class AdminController {
       }
       else {
         await Bursar.findOneAndUpdate({admin_id: decode.admin_id}, {
-          $set: {email,
+          $set: {email: email.toLowerCase(),
             full_name,
             phone_number,
             admin_id}
