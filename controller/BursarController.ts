@@ -18,10 +18,10 @@ class BursarController {
           let token = jwt.sign(payload, key);
           res.json(token);
         } else {
-          res.json({ error: "Passwords do not match" });
+          res.status(500).json({ error: "Passwords do not match" });
         }
       } else {
-        res.json({
+        res.status(500).json({
           error: "User does not exist",
         });
       }

@@ -59,7 +59,7 @@ class AdminController {
         .then(()=>HandleResponse(res, 200, `${hostel_name} room number ${room_number} added successfully`, NewRoom))
       }
       else {
-        HandleResponse(res, 200, `${hostel_name} room number ${room_number} exists already`, room)
+        HandleResponse(res, 500, `${hostel_name} room number ${room_number} exists already`, room)
       }
     })
   }
@@ -128,6 +128,12 @@ class AdminController {
     await Room.find({admin_id: decode.admin_id})
     .sort({created: -1})
     .then(rooms=> HandleResponse(res, 200, `All rooms retrieved successfully`, rooms))
+  }
+  static async GetAllBookings(req, res) {
+    var decode = jwt.verify(req.headers['authorization'],key)
+    await Booking.find({admin_id: decode.admin_id})
+    .sort({created: -1})
+    .then(bookings=> HandleResponse(res, 200, `All booking retrieved successfully`, bookings))
   }
   static async GetBursar(req, res) {
     var decode = jwt.verify(req.headers['authorization'],key)

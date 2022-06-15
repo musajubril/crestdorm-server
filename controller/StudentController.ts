@@ -19,10 +19,10 @@ class StudentController {
           let token = jwt.sign(payload, key);
           res.json(token);
         } else {
-          res.json({ error: "Passwords do not match" });
+          res.status(500).json({ error: "Passwords do not match" });
         }
       } else {
-        res.json({
+        res.status(500).json({
           error: "User does not exist",
         });
       }
@@ -60,7 +60,7 @@ class StudentController {
   }
   static async BookARoom(req, res) {
     var decode = jwt.verify(req.headers['authorization'],key)
-    const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee } = req.body
+    const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price } = req.body
     await Booking.findOne({student_id: decode.userId}).then(async book=>{
       if(!book) {
         await Room.findOne({room_number, hostel_name, id: room_id, gender: decode.gender})
@@ -68,7 +68,8 @@ class StudentController {
           if(room) {
             if(room.number_acceptable >= 1 + room.number_in_room) {
               const NewBooking = {
-                room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee
+                room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price,
+                matric_number: decode.matric_number, full_name: decode.full_name,phone_number:decode.phone_number
               }
               const updateRoom = {
                 number_of_bookings: room.number_of_bookings + 1
@@ -107,7 +108,21 @@ class StudentController {
     .then(async rooms=>{
       await Booking.findOne({student_id: decode.userId}).then(book=>{
           const newRooms = rooms.map(room=>{
-            const returnRoom = {...room, bookedStatus: room._id===book.room_id ? true : false}
+            const returnRoom = { 
+              number_in_room: room.number_in_room,
+              _id: room._id,
+              type: room.type,
+              image: room.image,
+              availability: room.availability,
+              room_number: room.room_number,
+              number_acceptable: room.number_acceptable,
+              hostel_name: room.hostel_name,
+              gender: room.gender,
+              price: room.price,
+              modified: room.modified,
+              created: room.created,
+              __v: 0,
+              admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id===book?.room_id ? true : false}
             return returnRoom
           })
           HandleResponse(res, 200, `All rooms retieved successfully`, newRooms)
@@ -122,7 +137,22 @@ class StudentController {
     .then(async rooms=>{
       await Booking.findOne({student_id: decode.userId}).then(book=>{
           const newRooms = rooms.map(room=>{
-            const returnRoom = {...room, bookedStatus: room._id===book.room_id ? true : false}
+            // console.log(room)
+            const returnRoom = { 
+              number_in_room: room.number_in_room,
+              _id: room._id,
+              type: room.type,
+              image: room.image,
+              availability: room.availability,
+              room_number: room.room_number,
+              number_acceptable: room.number_acceptable,
+              hostel_name: room.hostel_name,
+              gender: room.gender,
+              price: room.price,
+              modified: room.modified,
+              created: room.created,
+              __v: 0,
+              admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id===book?.room_id ? true : false}
             return returnRoom
           })
           HandleResponse(res, 200, `All rooms retieved successfully`, newRooms)
