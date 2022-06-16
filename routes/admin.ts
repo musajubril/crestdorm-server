@@ -8,6 +8,7 @@ router.post("/bursar/:booking_id", (req, res)=> AdminController.SendDataToBursar
 router.delete("/room/:room_id", (req, res)=> AdminController.DeleteRoom(req, res))
 router.post("/login", (req, res)=> AdminController.Login(req, res))
 router.post("/add_room", (req, res)=> AdminController.AddRoom(req, res))
+router.patch("/", (req, res)=> AdminController.AddRoom(req, res))
 router.get("/rooms", (req, res)=> AdminController.GetAllRooms(req, res))
 router.post("/add_bursar", (req, res)=> AdminController.CreateBursarAccount(req, res))
 router.get("/get_bursar", (req, res)=> AdminController.GetBursar(req, res))

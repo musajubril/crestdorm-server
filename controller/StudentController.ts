@@ -61,7 +61,7 @@ class StudentController {
   }
   static async BookARoom(req, res) {
     var decode = jwt.verify(req.headers['authorization'],key)
-    const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price } = req.body
+    const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price, admin_id } = req.body
     await Booking.findOne({student_id: decode.userId}).then(async book=>{
       if(!book) {
         await Room.findOne({room_number, hostel_name, id: room_id, gender: decode.gender})
@@ -70,7 +70,7 @@ class StudentController {
             if(room.number_acceptable >= 1 + room.number_in_room) {
               const NewBooking = {
                 room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price,
-                matric_number: decode.matric_number, full_name: decode.full_name,phone_number:decode.phone_number, student_id: decode.userId
+                matric_number: decode.matric_number, full_name: decode.full_name,phone_number:decode.phone_number, student_id: decode.userId, admin_id, gender:decode.gender
               }
               const updateRoom = {
                 number_of_bookings: room.number_of_bookings + 1
