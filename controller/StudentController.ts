@@ -122,6 +122,7 @@ class StudentController {
               gender: room.gender,
               price: room.price,
               modified: room.modified,
+              verified: book?.verified,
               created: room.created,
               __v: 0,
               admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id===book?.room_id ? true : false}
@@ -153,6 +154,7 @@ class StudentController {
               gender: room.gender,
               price: room.price,
               modified: room.modified,
+              verified: book?.verified,
               created: room.created,
               __v: 0,
               admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id.toString()===book?.room_id.toString() ? true : false}
