@@ -5,6 +5,7 @@ const BookingSchema = new mongoose.Schema({
     student_id: String,
     price: String,
     gender: String,
+    image: String,
     admin_id: String,
     send_to_bursar: {
         type: Boolean,

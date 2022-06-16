@@ -83,7 +83,7 @@ class StudentController {
     static BookARoom(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
-            const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price, admin_id } = req.body;
+            const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price, admin_id, image } = req.body;
             yield Booking_1.default.findOne({ student_id: decode.userId }).then((book) => __awaiter(this, void 0, void 0, function* () {
                 if (!book) {
                     yield Room_1.default.findOne({ room_number, hostel_name, id: room_id, gender: decode.gender })
@@ -92,7 +92,7 @@ class StudentController {
                             if (room.number_acceptable >= 1 + room.number_in_room) {
                                 const NewBooking = {
                                     room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price,
-                                    matric_number: decode.matric_number, full_name: decode.full_name, phone_number: decode.phone_number, student_id: decode.userId, admin_id, gender: decode.gender
+                                    matric_number: decode.matric_number, full_name: decode.full_name, phone_number: decode.phone_number, student_id: decode.userId, admin_id, image, gender: decode.gender
                                 };
                                 const updateRoom = {
                                     number_of_bookings: room.number_of_bookings + 1
