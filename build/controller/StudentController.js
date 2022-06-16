@@ -35,11 +35,11 @@ class StudentController {
                         res.json(token);
                     }
                     else {
-                        res.json({ error: "Passwords do not match" });
+                        res.status(500).json({ error: "Passwords do not match" });
                     }
                 }
                 else {
-                    res.json({
+                    res.status(500).json({
                         error: "User does not exist",
                     });
                 }
@@ -50,10 +50,10 @@ class StudentController {
         return __awaiter(this, void 0, void 0, function* () {
             const { password, email, phone_number, full_name, matric_number, jamb_number, gender } = req.body;
             const NewUser = {
-                password, email, phone_number, full_name, matric_number, jamb_number, gender
+                password, email: email.toLowerCase(), phone_number, full_name, matric_number, jamb_number, gender
             };
             bcryptjs_1.default.hash(password, 10, (err, hash) => {
-                Student_1.default.findOne({ email, phone_number, gender }).then((user) => {
+                Student_1.default.findOne({ email: email.toLowerCase(), phone_number, gender }).then((user) => {
                     if (user) {
                         console.log(user);
                         (0, HandleResponse_1.HandleResponse)(res, 500, `${full_name} exists already`, user);
@@ -83,38 +83,46 @@ class StudentController {
     static BookARoom(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
-            const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee } = req.body;
-            yield Room_1.default.findOne({ room_number, hostel_name, id: room_id, gender: decode.gender })
-                .then(room => {
-                if (room) {
-                    if (room.number_acceptable >= 1 + room.number_in_room) {
-                        const NewBooking = {
-                            room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee
-                        };
-                        const updateRoom = {
-                            number_of_bookings: room.number_of_bookings + 1
-                        };
-                        Booking_1.default.create(NewBooking)
-                            .then(() => {
-                            Room_1.default.findOneAndUpdate({ room_number, hostel_name, id: room_id, gender: decode.gender }, {
-                                $set: updateRoom
-                            }, {
-                                new: true,
-                                runValidators: true,
-                                upsert: true,
-                                returnOriginal: false,
-                                returnNewDocument: true
-                            }).exec()
-                                .then(() => {
-                                (0, HandleResponse_1.HandleResponse)(res, 200, `${hostel_name} room number ${room_number} booked successfully`, room);
-                            });
-                        });
-                    }
-                    if (room.number_acceptable < 1 + room.number_in_room) {
-                        (0, HandleResponse_1.HandleResponse)(res, 200, `${hostel_name} room number ${room_number} booking failed`, room);
-                    }
+            const { room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price, admin_id } = req.body;
+            yield Booking_1.default.findOne({ student_id: decode.userId }).then((book) => __awaiter(this, void 0, void 0, function* () {
+                if (!book) {
+                    yield Room_1.default.findOne({ room_number, hostel_name, id: room_id, gender: decode.gender })
+                        .then(room => {
+                        if (room) {
+                            if (room.number_acceptable >= 1 + room.number_in_room) {
+                                const NewBooking = {
+                                    room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price,
+                                    matric_number: decode.matric_number, full_name: decode.full_name, phone_number: decode.phone_number, student_id: decode.userId, admin_id, gender: decode.gender
+                                };
+                                const updateRoom = {
+                                    number_of_bookings: room.number_of_bookings + 1
+                                };
+                                Booking_1.default.create(NewBooking)
+                                    .then(() => {
+                                    Room_1.default.findOneAndUpdate({ room_number, hostel_name, _id: room_id, gender: decode.gender }, {
+                                        $set: updateRoom
+                                    }, {
+                                        new: true,
+                                        runValidators: true,
+                                        upsert: true,
+                                        returnOriginal: false,
+                                        returnNewDocument: true
+                                    }).exec()
+                                        .then(() => {
+                                        (0, HandleResponse_1.HandleResponse)(res, 200, `${hostel_name} room number ${room_number} booked successfully`, room);
+                                    });
+                                });
+                            }
+                            if (room.number_acceptable < 1 + room.number_in_room) {
+                                (0, HandleResponse_1.HandleResponse)(res, 500, `${hostel_name} room number ${room_number} booking failed`, room);
+                            }
+                        }
+                        else {
+                            (0, HandleResponse_1.HandleResponse)(res, 500, `you can't make more than one booking`, {});
+                        }
+                    });
                 }
-            });
+            }));
         });
     }
     static GetLatestRooms(req, res) {
@@ -122,9 +130,32 @@ class StudentController {
             var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
             yield Room_1.default.find({ availability: true, gender: decode.gender })
                 .sort({ created: -1 })
-                .then(rooms => {
-                (0, HandleResponse_1.HandleResponse)(res, 200, `All rooms retieved successfully`, rooms);
-            });
+                .then((rooms) => __awaiter(this, void 0, void 0, function* () {
+                yield Booking_1.default.findOne({ student_id: decode.userId }).then(book => {
+                    const newRooms = rooms.map(room => {
+                        console.log(book === null || book === void 0 ? void 0 : book.room_id, room._id);
+                        const returnRoom = {
+                            number_in_room: room.number_in_room,
+                            _id: room._id,
+                            type: room.type,
+                            image: room.image,
+                            availability: room.availability,
+                            room_number: room.room_number,
+                            number_acceptable: room.number_acceptable,
+                            hostel_name: room.hostel_name,
+                            gender: room.gender,
+                            price: room.price,
+                            modified: room.modified,
+                            created: room.created,
+                            __v: 0,
+                            admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id === (book === null || book === void 0 ? void 0 : book.room_id) ? true : false
+                        };
+                        return returnRoom;
+                    });
+                    (0, HandleResponse_1.HandleResponse)(res, 200, `All rooms retieved successfully`, newRooms);
+                });
+                // HandleResponse(res, 200, `All rooms retieved successfully`, rooms)
+            }));
         });
     }
     static GetAllRooms(req, res) {
@@ -132,7 +163,33 @@ class StudentController {
             var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
             yield Room_1.default.find({ gender: decode.gender })
                 .sort({ created: -1 })
-                .then(rooms => (0, HandleResponse_1.HandleResponse)(res, 200, `All rooms retrieved successfully`, rooms));
+                .then((rooms) => __awaiter(this, void 0, void 0, function* () {
+                yield Booking_1.default.findOne({ student_id: decode.userId }).then(book => {
+                    const newRooms = rooms.map(room => {
+                        // console.log(room._id===book?.room_id)
+                        // console.log(book?.room_id.toString(), room._id.toString())
+                        const returnRoom = {
+                            number_in_room: room.number_in_room,
+                            _id: room._id,
+                            type: room.type,
+                            image: room.image,
+                            availability: room.availability,
+                            room_number: room.room_number,
+                            number_acceptable: room.number_acceptable,
+                            hostel_name: room.hostel_name,
+                            gender: room.gender,
+                            price: room.price,
+                            modified: room.modified,
+                            created: room.created,
+                            __v: 0,
+                            admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id.toString() === (book === null || book === void 0 ? void 0 : book.room_id.toString()) ? true : false
+                        };
+                        return returnRoom;
+                    });
+                    (0, HandleResponse_1.HandleResponse)(res, 200, `All rooms retieved successfully`, newRooms);
+                });
+                // HandleResponse(res, 200, `All rooms retieved successfully`, rooms)
+            }));
         });
     }
 }

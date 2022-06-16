@@ -50,6 +50,7 @@ class AdminController {
     static AddRoom(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { type, image, video, room_number, number_acceptable, hostel_name, gender, price } = req.body;
+            var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
             const NewRoom = {
                 type,
                 image,
@@ -58,7 +59,8 @@ class AdminController {
                 number_acceptable,
                 hostel_name,
                 gender,
-                price
+                price,
+                admin_id: decode.admin_id
             };
             Room_1.default.findOne({ room_number, hostel_name, gender })
                 .then(room => {
@@ -67,7 +69,7 @@ class AdminController {
                         .then(() => (0, HandleResponse_1.HandleResponse)(res, 200, `${hostel_name} room number ${room_number} added successfully`, NewRoom));
                 }
                 else {
-                    (0, HandleResponse_1.HandleResponse)(res, 200, `${hostel_name} room number ${room_number} exists already`, room);
+                    (0, HandleResponse_1.HandleResponse)(res, 500, `${hostel_name} room number ${room_number} exists already`, room);
                 }
             });
         });
@@ -76,22 +78,37 @@ class AdminController {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO: send email or message once Bursar account creates successfully
             var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
-            const { email, phone_number, full_name } = req.body;
+            const { email, phone_number, full_name, admin_id } = req.body;
             const NewBursar = {
-                email,
+                email: email.toLowerCase(),
                 full_name,
-                phone_number
+                phone_number,
+                admin_id
             };
-            yield Bursar_1.default.findOne({ admin_id: decode._id })
-                .then(bursar => {
+            yield Bursar_1.default.findOne({ admin_id: decode.admin_id })
+                .then((bursar) => __awaiter(this, void 0, void 0, function* () {
                 if (!bursar) {
                     Bursar_1.default.create(NewBursar)
                         .then(() => (0, HandleResponse_1.HandleResponse)(res, 200, `${full_name}'s account created successfully`, NewBursar));
                 }
                 else {
-                    (0, HandleResponse_1.HandleResponse)(res, 200, `${full_name}'s account creation failed, you can't have more than one Bursar`, bursar);
+                    yield Bursar_1.default.findOneAndUpdate({ admin_id: decode.admin_id }, {
+                        $set: { email: email.toLowerCase(),
+                            full_name,
+                            phone_number,
+                            admin_id }
+                    }, {
+                        new: true,
+                        runValidators: true,
+                        upsert: true,
+                        returnOriginal: false,
+                        returnNewDocument: true
+                    }).exec()
+                        .then(() => {
+                        (0, HandleResponse_1.HandleResponse)(res, 200, `${full_name}'s account updated successfully`, bursar);
+                    });
                 }
-            });
+            }));
         });
     }
     static DeleteRoom(req, res) {
@@ -121,6 +138,29 @@ class AdminController {
                     (0, HandleResponse_1.HandleResponse)(res, 200, `All Bookings found successfully`, bookings);
                 });
             }));
+        });
+    }
+    static GetAllRooms(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
+            yield Room_1.default.find({ admin_id: decode.admin_id })
+                .sort({ created: -1 })
+                .then(rooms => (0, HandleResponse_1.HandleResponse)(res, 200, `All rooms retrieved successfully`, rooms));
+        });
+    }
+    static GetAllBookings(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
+            yield Booking_1.default.find({ admin_id: decode.admin_id })
+                .sort({ created: -1 })
+                .then(bookings => (0, HandleResponse_1.HandleResponse)(res, 200, `All booking retrieved successfully`, bookings));
+        });
+    }
+    static GetBursar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
+            yield Bursar_1.default.findOne({ admin_id: decode.admin_id })
+                .then(bursar => (0, HandleResponse_1.HandleResponse)(res, 200, `Bursar info retrieval was a success`, bursar));
         });
     }
 }

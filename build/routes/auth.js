@@ -11,4 +11,5 @@ router.use((0, cors_1.default)());
 router.post("/login", (req, res) => AuthController_1.default.Login(req, res));
 router.post("/admin-register", (req, res) => AuthController_1.default.CreateAdmin(req, res));
 router.post("/student-register", (req, res) => AuthController_1.default.CreateStudent(req, res));
+router.post("/verify-bursar", (req, res) => AuthController_1.default.VerifyBursar(req, res));
 module.exports = router;

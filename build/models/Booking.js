@@ -3,13 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require('mongoose');
 const BookingSchema = new mongoose.Schema({
     type: String,
+    student_id: String,
+    price: String,
+    gender: String,
+    admin_id: String,
     send_to_bursar: {
         type: Boolean,
         default: false
     },
     verified: {
-        type: Boolean || String,
-        default: "Pending"
+        type: Boolean,
+        default: false
     },
     matric_number: String,
     full_name: String,

@@ -20,11 +20,56 @@ const User_1 = __importDefault(require("../models/User"));
 const HandleResponse_1 = require("../HandleResponse");
 const key = process.env.SECRET_KEY || "secret";
 class AuthController {
+    static VerifyBursar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password } = req.body;
+            const NewUser = {
+                email: email.toLowerCase(), password, phone_number: null, account_type: "Bursar"
+            };
+            yield Bursar_1.default.findOne({ email: email.toLowerCase() })
+                .then((bursar) => __awaiter(this, void 0, void 0, function* () {
+                if (bursar) {
+                    yield Bursar_1.default.findOneAndUpdate({ email: email.toLowerCase() }, {
+                        $set: { verified: true }
+                    }, {
+                        new: true,
+                        runValidators: true,
+                        upsert: true,
+                        returnOriginal: false,
+                        returnNewDocument: true
+                    }).exec()
+                        .then(() => {
+                        bcryptjs_1.default.hash(password, 10, (err, hash) => __awaiter(this, void 0, void 0, function* () {
+                            NewUser.password = hash;
+                            NewUser.phone_number = bursar.phone_number;
+                            yield User_1.default.create(NewUser).then((user) => __awaiter(this, void 0, void 0, function* () {
+                                yield Bursar_1.default.findOneAndUpdate({ email: email.toLowerCase() }, {
+                                    $set: { user_id: user._id }
+                                }, {
+                                    new: true,
+                                    runValidators: true,
+                                    upsert: true,
+                                    returnOriginal: false,
+                                    returnNewDocument: true
+                                }).exec()
+                                    .then(() => {
+                                    (0, HandleResponse_1.HandleResponse)(res, 200, `${bursar.full_name} account verification successful`, bursar);
+                                });
+                            }));
+                        }));
+                    });
+                }
+                else {
+                    (0, HandleResponse_1.HandleResponse)(res, 500, `${email} account verification failed`, email);
+                }
+            }));
+        });
+    }
     static Login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             console.log(email, password);
-            yield User_1.default.findOne({ email }).then((user) => {
+            yield User_1.default.findOne({ email: email.toLowerCase() }).then((user) => {
                 if (user) {
                     if (user.account_type === "Student") {
                         console.log("Student");
@@ -47,7 +92,7 @@ class AuthController {
                             });
                         }
                         else {
-                            res.json({ error: "Passwords do not match" });
+                            res.status(500).json({ error: "Passwords do not match" });
                         }
                     }
                     if (user.account_type === "Bursar") {
@@ -69,14 +114,14 @@ class AuthController {
                             });
                         }
                         else {
-                            res.json({ error: "Passwords do not match" });
+                            res.status(500).json({ error: "Passwords do not match" });
                         }
                     }
                     if (user.account_type === "Admin") {
                         console.log("Admin");
                         if (bcryptjs_1.default.compareSync(password, user.password)) {
                             const payload = {
-                                userId: user._id,
+                                admin_id: user._id,
                                 email: user.email,
                                 phone_number: user.email,
                                 account_type: user.account_type
@@ -90,7 +135,7 @@ class AuthController {
                     }
                 }
                 else {
-                    res.json({
+                    res.status(401).json({
                         error: "User does not exist",
                     });
                 }
@@ -107,7 +152,7 @@ class AuthController {
                 password, email, phone_number, account_type: "Student"
             };
             bcryptjs_1.default.hash(password, 10, (err, hash) => {
-                User_1.default.findOne({ email, phone_number }).then((user) => {
+                User_1.default.findOne({ email: email.toLowerCase(), phone_number }).then((user) => {
                     if (user) {
                         console.log(user);
                         (0, HandleResponse_1.HandleResponse)(res, 500, `An account with the email: ${full_name} exists already`, user);
@@ -115,7 +160,7 @@ class AuthController {
                     if (!user) {
                         NewUser.password = hash;
                         User_1.default.create(NewUser).then(() => __awaiter(this, void 0, void 0, function* () {
-                            yield User_1.default.findOne({ email, phone_number, account_type: "Student" })
+                            yield User_1.default.findOne({ email: email.toLowerCase(), phone_number, account_type: "Student" })
                                 .then(verifiedUser => {
                                 NewStudent.student_id = verifiedUser._id;
                                 Student_1.default.create(NewStudent).then(() => {
@@ -138,7 +183,7 @@ class AuthController {
                 password, email, phone_number, account_type: "Admin"
             };
             bcryptjs_1.default.hash(password, 10, (err, hash) => {
-                User_1.default.findOne({ email, phone_number, account_type: "Admin" }).then((user) => {
+                User_1.default.findOne({ email: email.toLowerCase(), phone_number, account_type: "Admin" }).then((user) => {
                     if (user) {
                         console.log(user);
                         (0, HandleResponse_1.HandleResponse)(res, 500, `An account with the email: ${email} exists already`, user);

@@ -27,18 +27,18 @@ class BursarController {
                     if (bcryptjs_1.default.compareSync(password, user.password)) {
                         const payload = {
                             userId: user._id,
-                            email: user.email,
+                            email: user.email.toLowerCase(),
                             phone_number: user.email
                         };
                         let token = jsonwebtoken_1.default.sign(payload, key);
                         res.json(token);
                     }
                     else {
-                        res.json({ error: "Passwords do not match" });
+                        res.status(500).json({ error: "Passwords do not match" });
                     }
                 }
                 else {
-                    res.json({
+                    res.status(500).json({
                         error: "User does not exist",
                     });
                 }
