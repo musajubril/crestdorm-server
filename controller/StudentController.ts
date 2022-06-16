@@ -5,6 +5,7 @@ import { HandleResponse } from "../HandleResponse";
 import Room from './../models/Room';
 import Booking from './../models/Booking';
 import { Console } from "console";
+import { decode } from "punycode";
 const key = process.env.SECRET_KEY || "secret";
 class StudentController {
   static async Login(req, res) {
@@ -163,6 +164,13 @@ class StudentController {
           HandleResponse(res, 200, `All rooms retieved successfully`, newRooms)
       })
       // HandleResponse(res, 200, `All rooms retieved successfully`, rooms)
+    })
+  }
+  static async GetMyBooking(req, res){
+    var decode = jwt.verify(req.headers['authorization'],key) 
+    await Booking.findOne({student_id: decode.userId})
+    .then(book=>{
+      HandleResponse(res, 200, "Booking Found Successfully", book)
     })
   }
 }

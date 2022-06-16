@@ -9,6 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const StudentController_1 = __importDefault(require("../controller/StudentController"));
 router.use((0, cors_1.default)());
 router.get("/", (req, res) => StudentController_1.default.GetStudents(req, res));
+router.get("/booking", (req, res) => StudentController_1.default.GetMyBooking(req, res));
 router.get("/rooms", (req, res) => StudentController_1.default.GetAllRooms(req, res));
 router.get("/latest", (req, res) => StudentController_1.default.GetLatestRooms(req, res));
 router.post("/login", (req, res) => StudentController_1.default.Login(req, res));

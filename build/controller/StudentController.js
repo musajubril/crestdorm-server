@@ -194,5 +194,14 @@ class StudentController {
             }));
         });
     }
+    static GetMyBooking(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
+            yield Booking_1.default.findOne({ student_id: decode.userId })
+                .then(book => {
+                (0, HandleResponse_1.HandleResponse)(res, 200, "Booking Found Successfully", book);
+            });
+        });
+    }
 }
 exports.default = StudentController;
