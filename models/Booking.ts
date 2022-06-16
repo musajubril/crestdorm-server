@@ -10,8 +10,8 @@ const BookingSchema = new mongoose.Schema({
         default: false
     },
     verified: {
-        type: Boolean || String,
-        default: "Pending"
+        type: Boolean,
+        default: false
     },
     matric_number: String,
     full_name: String,

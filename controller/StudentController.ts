@@ -4,6 +4,7 @@ import Student from "../models/Student";
 import { HandleResponse } from "../HandleResponse";
 import Room from './../models/Room';
 import Booking from './../models/Booking';
+import { Console } from "console";
 const key = process.env.SECRET_KEY || "secret";
 class StudentController {
   static async Login(req, res) {
@@ -69,14 +70,14 @@ class StudentController {
             if(room.number_acceptable >= 1 + room.number_in_room) {
               const NewBooking = {
                 room_number, room_id, hostel_name, proof_of_payment_school_fee, proof_of_payment_hostel_fee, price,
-                matric_number: decode.matric_number, full_name: decode.full_name,phone_number:decode.phone_number
+                matric_number: decode.matric_number, full_name: decode.full_name,phone_number:decode.phone_number, student_id: decode.userId
               }
               const updateRoom = {
                 number_of_bookings: room.number_of_bookings + 1
               }
               Booking.create(NewBooking)
               .then(()=>{
-                Room.findOneAndUpdate({room_number, hostel_name, id: room_id, gender: decode.gender}, {
+                Room.findOneAndUpdate({room_number, hostel_name, _id: room_id, gender: decode.gender}, {
                   $set: updateRoom
               }, {
                   new: true,
@@ -108,6 +109,7 @@ class StudentController {
     .then(async rooms=>{
       await Booking.findOne({student_id: decode.userId}).then(book=>{
           const newRooms = rooms.map(room=>{
+            console.log(book?.room_id, room._id)
             const returnRoom = { 
               number_in_room: room.number_in_room,
               _id: room._id,
@@ -136,8 +138,9 @@ class StudentController {
     .sort({created: -1})
     .then(async rooms=>{
       await Booking.findOne({student_id: decode.userId}).then(book=>{
-          const newRooms = rooms.map(room=>{
-            // console.log(room)
+        const newRooms = rooms.map(room=>{
+            // console.log(room._id===book?.room_id)
+            // console.log(book?.room_id.toString(), room._id.toString())
             const returnRoom = { 
               number_in_room: room.number_in_room,
               _id: room._id,
@@ -152,7 +155,7 @@ class StudentController {
               modified: room.modified,
               created: room.created,
               __v: 0,
-              admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id===book?.room_id ? true : false}
+              admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id.toString()===book?.room_id.toString() ? true : false}
             return returnRoom
           })
           HandleResponse(res, 200, `All rooms retieved successfully`, newRooms)
