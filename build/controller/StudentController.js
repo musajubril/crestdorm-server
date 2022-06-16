@@ -149,7 +149,7 @@ class StudentController {
                             verified: book === null || book === void 0 ? void 0 : book.verified,
                             created: room.created,
                             __v: 0,
-                            admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id === (book === null || book === void 0 ? void 0 : book.room_id) ? true : false
+                            admin_id: room.admin_id, bookedStatus: room._id === (book === null || book === void 0 ? void 0 : book.room_id) ? true : false
                         };
                         return returnRoom;
                     });
@@ -184,7 +184,7 @@ class StudentController {
                             verified: book === null || book === void 0 ? void 0 : book.verified,
                             created: room.created,
                             __v: 0,
-                            admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id.toString() === (book === null || book === void 0 ? void 0 : book.room_id.toString()) ? true : false
+                            admin_id: room.admin_id, bookedStatus: room._id.toString() === (book === null || book === void 0 ? void 0 : book.room_id.toString()) ? true : false
                         };
                         return returnRoom;
                     });

@@ -125,7 +125,7 @@ class StudentController {
               verified: book?.verified,
               created: room.created,
               __v: 0,
-              admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id===book?.room_id ? true : false}
+              admin_id: room.admin_id, bookedStatus: room._id===book?.room_id ? true : false}
             return returnRoom
           })
           HandleResponse(res, 200, `All rooms retieved successfully`, newRooms)
@@ -157,7 +157,7 @@ class StudentController {
               verified: book?.verified,
               created: room.created,
               __v: 0,
-              admin_id: '62a4306f6ee2e92822bf3b1e', bookedStatus: room._id.toString()===book?.room_id.toString() ? true : false}
+              admin_id: room.admin_id, bookedStatus: room._id.toString()===book?.room_id.toString() ? true : false}
             return returnRoom
           })
           HandleResponse(res, 200, `All rooms retieved successfully`, newRooms)
