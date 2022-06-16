@@ -19,6 +19,7 @@ const HandleResponse_1 = require("../HandleResponse");
 const Room_1 = __importDefault(require("./../models/Room"));
 const Bursar_1 = __importDefault(require("./../models/Bursar"));
 const Booking_1 = __importDefault(require("./../models/Booking"));
+const Student_2 = __importDefault(require("../models/Student"));
 const key = process.env.SECRET_KEY || "secret";
 class AdminController {
     static Login(req, res) {
@@ -161,6 +162,61 @@ class AdminController {
             var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
             yield Bursar_1.default.findOne({ admin_id: decode.admin_id })
                 .then(bursar => (0, HandleResponse_1.HandleResponse)(res, 200, `Bursar info retrieval was a success`, bursar));
+        });
+    }
+    static DashboardData(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var decode = jsonwebtoken_1.default.verify(req.headers['authorization'], key);
+            yield Booking_1.default.find({ admin_id: decode.admin_id })
+                .then((bookings) => __awaiter(this, void 0, void 0, function* () {
+                yield Student_2.default.find()
+                    .then((student) => __awaiter(this, void 0, void 0, function* () {
+                    Bursar_1.default.findOne({ admin_id: decode.admin_id })
+                        .then((bursar) => __awaiter(this, void 0, void 0, function* () {
+                        yield Room_1.default.find({ admin_id: decode.admin_id })
+                            .then((rooms) => __awaiter(this, void 0, void 0, function* () {
+                            yield Room_1.default.find({ admin_id: decode.admin_id, type: "Private" })
+                                .then((special) => __awaiter(this, void 0, void 0, function* () {
+                                yield Room_1.default.find({ admin_id: decode.admin_id, type: "General" })
+                                    .then((general) => __awaiter(this, void 0, void 0, function* () {
+                                    yield Booking_1.default.find({ verified: true })
+                                        .then(verified => {
+                                        const sum = (input) => {
+                                            if (toString.call(input) !== "[object Array]")
+                                                return false;
+                                            var total = 0;
+                                            for (var i = 0; i < input.length; i++) {
+                                                if (isNaN(input[i])) {
+                                                    continue;
+                                                }
+                                                total += Number(input[i]);
+                                            }
+                                            return total;
+                                        };
+                                        // const verifiedBooking = bookings?.filter(book=>book?.verified)
+                                        const dashData = {
+                                            bursar_name: bursar === null || bursar === void 0 ? void 0 : bursar.full_name,
+                                            bursar_phone_number: bursar === null || bursar === void 0 ? void 0 : bursar.phone_number,
+                                            bursar_email: bursar === null || bursar === void 0 ? void 0 : bursar.email,
+                                            general: general === null || general === void 0 ? void 0 : general.length,
+                                            special: special === null || special === void 0 ? void 0 : special.length,
+                                            bookings: bookings === null || bookings === void 0 ? void 0 : bookings.length,
+                                            rooms: rooms === null || rooms === void 0 ? void 0 : rooms.length,
+                                            student: student === null || student === void 0 ? void 0 : student.length,
+                                            bookingPrice: sum(verified === null || verified === void 0 ? void 0 : verified.map(book => book === null || book === void 0 ? void 0 : book.price)),
+                                            totalPrice: sum(rooms === null || rooms === void 0 ? void 0 : rooms.map(room => Number(room === null || room === void 0 ? void 0 : room.number_acceptable) * Number(room === null || room === void 0 ? void 0 : room.price))),
+                                            privatePrice: sum(special === null || special === void 0 ? void 0 : special.map(room => Number(room === null || room === void 0 ? void 0 : room.number_acceptable) * Number(room === null || room === void 0 ? void 0 : room.price))),
+                                            generalPrice: sum(general === null || general === void 0 ? void 0 : general.map(room => Number(room === null || room === void 0 ? void 0 : room.number_acceptable) * Number(room === null || room === void 0 ? void 0 : room.price))),
+                                        };
+                                        console.log(dashData);
+                                        (0, HandleResponse_1.HandleResponse)(res, 200, "Dashboard Data Found successfully", dashData);
+                                    });
+                                }));
+                            }));
+                        }));
+                    }));
+                }));
+            }));
         });
     }
 }

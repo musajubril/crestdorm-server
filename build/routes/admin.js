@@ -17,4 +17,5 @@ router.get("/rooms", (req, res) => AdminController_1.default.GetAllRooms(req, re
 router.post("/add_bursar", (req, res) => AdminController_1.default.CreateBursarAccount(req, res));
 router.get("/get_bursar", (req, res) => AdminController_1.default.GetBursar(req, res));
 router.get("/get_bookings", (req, res) => AdminController_1.default.GetAllBookings(req, res));
+router.get("/dashboard", (req, res) => AdminController_1.default.DashboardData(req, res));
 module.exports = router;

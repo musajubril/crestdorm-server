@@ -5,6 +5,7 @@ import { HandleResponse } from "../HandleResponse";
 import Room from './../models/Room';
 import Bursar from './../models/Bursar';
 import Booking from './../models/Booking';
+import Student from '../models/Student';
 const key = process.env.SECRET_KEY || "secret";
 class AdminController {
   static async Login(req, res) {
@@ -139,6 +140,59 @@ class AdminController {
     var decode = jwt.verify(req.headers['authorization'],key)
     await Bursar.findOne({admin_id: decode.admin_id})
     .then(bursar=> HandleResponse(res, 200, `Bursar info retrieval was a success`, bursar))
+  }
+  static async DashboardData(req, res){
+    var decode = jwt.verify(req.headers['authorization'],key)
+    await Booking.find({admin_id: decode.admin_id})
+    .then(async bookings=>{
+      await Student.find()
+      .then(async student=>{
+        Bursar.findOne({admin_id: decode.admin_id})
+        .then(async bursar=>{
+          await Room.find({admin_id: decode.admin_id})
+          .then(async rooms=>{
+            await Room.find({admin_id: decode.admin_id, type: "Private"})
+            .then(async special=>{
+              await Room.find({admin_id: decode.admin_id, type: "General"})
+              .then(async general=>{
+                await Booking.find({verified: true})
+                .then(verified=>{
+                  const sum=(input)=>{
+                    if(toString.call(input)!=="[object Array]")
+                    return false
+                    var total = 0
+                    for (var i = 0; i<input.length;i++){
+                      if(isNaN(input[i])){
+                        continue
+                      }
+                      total += Number(input[i])
+                    }
+                    return total
+                  }
+                  // const verifiedBooking = bookings?.filter(book=>book?.verified)
+                  const dashData = {
+                    bursar_name: bursar?.full_name,
+                    bursar_phone_number: bursar?.phone_number,
+                    bursar_email: bursar?.email,
+                    general: general?.length,
+                    special: special?.length,
+                    bookings: bookings?.length,
+                    rooms: rooms?.length,
+                    student: student?.length,
+                    bookingPrice: sum(verified?.map(book=>book?.price)),
+                    totalPrice: sum(rooms?.map(room=>Number(room?.number_acceptable)*Number(room?.price))),
+                    privatePrice: sum(special?.map(room=>Number(room?.number_acceptable)*Number(room?.price))),
+                    generalPrice: sum(general?.map(room=>Number(room?.number_acceptable)*Number(room?.price))),
+                  }
+                  console.log(dashData)
+                  HandleResponse(res, 200, "Dashboard Data Found successfully", dashData)
+                })
+              })
+            })
+          })
+        })
+      })
+    })
   }
 }
 export default AdminController;

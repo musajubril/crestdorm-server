@@ -13,5 +13,6 @@ router.get("/rooms", (req, res)=> AdminController.GetAllRooms(req, res))
 router.post("/add_bursar", (req, res)=> AdminController.CreateBursarAccount(req, res))
 router.get("/get_bursar", (req, res)=> AdminController.GetBursar(req, res))
 router.get("/get_bookings", (req, res)=> AdminController.GetAllBookings(req, res))
+router.get("/dashboard", (req, res)=> AdminController.DashboardData(req, res))
 
 module.exports = router
