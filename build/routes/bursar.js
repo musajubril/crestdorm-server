@@ -10,6 +10,7 @@ const BursarController_1 = __importDefault(require("../controller/BursarControll
 router.use((0, cors_1.default)());
 router.post("/login", (req, res) => BursarController_1.default.Login(req, res));
 router.get("/bookings", (req, res) => BursarController_1.default.GetAllSentBookings(req, res));
+router.get("/dashboard", (req, res) => BursarController_1.default.DashboardData(req, res));
 router.post("/not_verified:booking_id", (req, res) => BursarController_1.default.SetNotVerified(req, res));
 router.post("/verified:booking_id", (req, res) => BursarController_1.default.SetVerified(req, res));
 module.exports = router;
