@@ -48,7 +48,7 @@ class AuthController {
           })
         }
         else {
-        HandleResponse(res, 500, `${email} account verification failed`, email)
+        HandleResponse(res, 500, `can't find an account with email: ${email}`, email)
       }
     })
   }
