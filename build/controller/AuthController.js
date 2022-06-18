@@ -26,8 +26,10 @@ class AuthController {
             const NewUser = {
                 email: email.toLowerCase(), password, phone_number: null, account_type: "Bursar"
             };
+            console.log(NewUser);
             yield Bursar_1.default.findOne({ email: email.toLowerCase() })
                 .then((bursar) => __awaiter(this, void 0, void 0, function* () {
+                console.log(bursar);
                 if (bursar) {
                     yield Bursar_1.default.findOneAndUpdate({ email: email.toLowerCase() }, {
                         $set: { verified: true }
@@ -60,7 +62,7 @@ class AuthController {
                     });
                 }
                 else {
-                    (0, HandleResponse_1.HandleResponse)(res, 500, `${email} account verification failed`, email);
+                    (0, HandleResponse_1.HandleResponse)(res, 500, `can't find an account with email: ${email}`, email);
                 }
             }));
         });
