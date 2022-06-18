@@ -11,8 +11,10 @@ class AuthController {
     const NewUser = {
       email:email.toLowerCase(), password, phone_number: null, account_type: "Bursar"
     }
+    console.log(NewUser)
     await Bursar.findOne({email: email.toLowerCase()})
     .then(async bursar=> {
+      console.log(bursar)
       if(bursar) {
         await Bursar.findOneAndUpdate({email: email.toLowerCase()}, {
           $set: {verified: true}
