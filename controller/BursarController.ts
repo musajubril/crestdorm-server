@@ -38,19 +38,27 @@ class BursarController {
   static async SetVerified(req, res) {
     var decode = jwt.verify(req.headers['authorization'],key)
     const{booking_id} = req.params
-    await Booking.findOneAndUpdate({_id: booking_id}, {
-      $set: {verified: true}
-    }, {
-      new: true,
-      runValidators: true,
-      upsert: true,
-      returnOriginal: true,
-      returnNewDocument: true,
-    }).exec()
-    .then(async ()=>{
-      await Booking.find()
-      .then(bookings=>{
-        HandleResponse(res, 200, `All Bookings found successfully`, bookings)
+    await Booking.findOne({_id: booking_id}).then(async (book)=>{
+      await Room.findOne({_id: book?.room_id}).then(async room=>{
+        await Room.findOneAndUpdate({_id: book?.room_id}, {
+          $set: {number_in_room: room?.number_in_room + 1}
+        }).then(async()=>{
+          await Booking.findOneAndUpdate({_id: booking_id}, {
+            $set: {verified: true}
+          }, {
+            new: true,
+            runValidators: true,
+            upsert: true,
+            returnOriginal: true,
+            returnNewDocument: true,
+          }).exec()
+          .then(async ()=>{
+            await Booking.find()
+            .then(bookings=>{
+              HandleResponse(res, 200, `All Bookings found successfully`, bookings)
+            })
+          })
+        })
       })
     })
   }
