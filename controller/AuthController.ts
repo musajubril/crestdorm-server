@@ -144,7 +144,7 @@ class AuthController {
           User.create(NewUser).then(async() => {
             await User.findOne({email: email.toLowerCase(), phone_number, account_type: "Student"})
             .then(verifiedUser=>{
-              NewStudent.student_id = verifiedUser._id
+              NewStudent.student_id = verifiedUser?._id
               Student.create(NewStudent).then(()=>{
                 HandleResponse(res, 200, `${full_name} registration successful`, {...NewStudent,
                 created:verifiedUser.created,

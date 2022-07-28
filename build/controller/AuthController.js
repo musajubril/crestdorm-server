@@ -164,7 +164,7 @@ class AuthController {
                         User_1.default.create(NewUser).then(() => __awaiter(this, void 0, void 0, function* () {
                             yield User_1.default.findOne({ email: email.toLowerCase(), phone_number, account_type: "Student" })
                                 .then(verifiedUser => {
-                                NewStudent.student_id = verifiedUser._id;
+                                NewStudent.student_id = verifiedUser?._id;
                                 Student_1.default.create(NewStudent).then(() => {
                                     (0, HandleResponse_1.HandleResponse)(res, 200, `${full_name} registration successful`, Object.assign(Object.assign({}, NewStudent), { created: verifiedUser.created, modified: verifiedUser.modified }));
                                 });
